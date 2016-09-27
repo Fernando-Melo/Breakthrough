@@ -9,9 +9,7 @@ angular.module('ngCheckers', [])
       this.player = player;
       this.x = x;
       this.y = y;
-      this.isKing = false;
       this.isChoice = false;
-      this.matados = [];
     }
 
     $scope.newGame = function() {
@@ -61,17 +59,14 @@ angular.module('ngCheckers', [])
 
     $scope.select = function(square) {
       if (selectedSquare !== null && !square.player) {
-        //alert('1');
         movePiece(square);
         checkGameOver(square);      
         resetChoices();
       } else if (square.player === $scope.player) {
-        //alert('2');
         selectedSquare = square;
         resetChoices();
-        setChoices(selectedSquare.x, selectedSquare.y, 1, [],-1,-1,selectedSquare.isKing);
+        setChoices(selectedSquare.x, selectedSquare.y, []);
       } else {
-        //alert('3');
         movePiece(square);
         checkGameOver(square);        
         resetChoices();
@@ -85,80 +80,28 @@ angular.module('ngCheckers', [])
       for (var i = 0; i < BOARD_WIDTH; i++) {
         for (var j = 0; j < BOARD_WIDTH; j++) {
           $scope.board[i][j].isChoice = false;
-          $scope.board[i][j].matados = [];
         }
       }
     }
 
     function movePiece(square) {
       if (square.isChoice) {
-        var becomeKing = selectedSquare.isKing;
-        // Jump dude
-        for (var i = 0; i < square.matados.length; i++) {
-          var matado = square.matados[i];
-          jump(matado);
-          becomeKing = becomeKing || becomeKingAfterJump(matado.x, matado.y);
-        }
-
         square.player = selectedSquare.player;
-        square.isKing = becomeKing || isKing(square);
         selectedSquare.player = null;
-        selectedSquare.isKing = false;
         $scope.player = $scope.player === RED ? BLACK : RED;
       }
     }
 
-    function isKing(square) {
-      if ($scope.player === RED) {
-        if (square.y === 0) 
-          return true;
-      } else {
-        if (square.y === BOARD_WIDTH - 1)
-          return true;
-      }
-      return false;
-    }
 
-    function becomeKingAfterJump(x, y){
-      return ($scope.player === RED && y == 1) ||
-             ($scope.player === BLACK && y == BOARD_WIDTH - 2);
-    }
-
-    function jump(jumped) {
-      jumped.player = null;
-      jumped.isKing = false;
-      if ($scope.player === RED) {
-        $scope.redScore++;
-        if ($scope.redScore === 8) {
-          $timeout(function() {
-            //gameOver(RED);
-          },50)
-        }
-      }
-      else {
-        $scope.blackScore++;
-        if ($scope.blackScore === 8) {
-          $timeout(function() {
-           // gameOver(BLACK);
-          },50)
-        }
-      }
-    }
-
-    function setChoices(x, y, depth, matados, oldX, oldY, isKing) {
-      if (depth > 10) return;
-      isKing = 
-          isKing || 
-          ($scope.player === RED && y == 0) || 
-          ($scope.player === BLACK && y == BOARD_WIDTH - 1);
+    function setChoices(x, y) {
       // Upper Choices
-      if ($scope.player === RED || isKing) {
+      if ($scope.player === RED) {
         // Upper Left
         if (x > 0 && y > 0) {
           var UP_LEFT = $scope.board[y-1][x-1];
           if (UP_LEFT.player ===RED) {/*Do nothing you have one of your pieces in front*/}
           else if (UP_LEFT.player ===BLACK){UP_LEFT.isChoice = true;} 
-          else if (depth === 1) {
+          else {
             UP_LEFT.isChoice = true;
           }
         }
@@ -166,7 +109,7 @@ angular.module('ngCheckers', [])
         if (x >= 0 && y > 0) {
           var UP_FRONT = $scope.board[y-1][x];
           if (UP_FRONT.player) {/*Do nothing you have a piece in front and cant take directly in front*/} 
-          else if (depth === 1) {
+          else {
             UP_FRONT.isChoice = true;
           }
         }        
@@ -175,19 +118,19 @@ angular.module('ngCheckers', [])
           var UP_RIGHT = $scope.board[y-1][x+1];
           if (UP_RIGHT.player ===RED) {/*Do nothing you have one of your pieces in front*/}
           else if (UP_RIGHT.player ===BLACK){UP_RIGHT.isChoice = true;} 
-          else if (depth === 1) {          
+          else {          
             UP_RIGHT.isChoice = true;
           }
         }
       }
       // Lower Choices
-      if ($scope.player === BLACK || isKing) {
+      if ($scope.player === BLACK) {
         // Lower Left
         if (x > 0 && y < BOARD_WIDTH - 1) {
           var LOWER_LEFT = $scope.board[y+1][x-1];
           if (LOWER_LEFT.player ===BLACK) {/*Do nothing you have one of your pieces in front*/}
           else if (LOWER_LEFT.player ===RED){LOWER_LEFT.isChoice = true;}   
-          else if (depth === 1) {
+          else {
             LOWER_LEFT.isChoice = true;
           }
         }
@@ -195,7 +138,7 @@ angular.module('ngCheckers', [])
         if (x >= 0 && y < BOARD_WIDTH - 1) {
           var LOWER_FRONT = $scope.board[y+1][x];
           if (LOWER_FRONT.player) {/*Do nothing you have a piece in front and cant take directly in front*/} 
-          else if (depth === 1) {
+          else {
             LOWER_FRONT.isChoice = true;
           }
         }      
@@ -204,7 +147,7 @@ angular.module('ngCheckers', [])
           var LOWER_RIGHT = $scope.board[y+1][x+1];
           if (LOWER_RIGHT.player ===BLACK) {/*Do nothing you have one of your pieces in front*/}
           else if (LOWER_RIGHT.player ===RED){LOWER_RIGHT.isChoice = true;}            
-          else if (depth === 1) {
+          else {
             LOWER_RIGHT.isChoice = true;
           }
         }
@@ -213,11 +156,15 @@ angular.module('ngCheckers', [])
 
     function checkGameOver(square){
         if (square.player === RED && square.y == 0)
-            {top.alert('Red wins');
-            $scope.newGame();}
+            {
+              top.alert('Red wins');
+              $scope.newGame();
+            }
         if(square.player === BLACK && square.y == BOARD_WIDTH - 1)
-            {top.alert('Black wins'); 
-            $scope.newGame();} 
+            {
+              top.alert('Black wins'); 
+              $scope.newGame();
+            } 
     }
 
   });
