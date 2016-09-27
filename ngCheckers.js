@@ -190,7 +190,7 @@ angular.module('ngCheckers', [])
           }
         }
         // Lower Middle
-        if (x >= 0 && y > 0) {
+        if (x >= 0 && y < BOARD_WIDTH - 1) {
           var LOWER_FRONT = $scope.board[y+1][x];
           if (LOWER_FRONT.player) {/*Do nothing you have a piece in front and cant take directly in front*/} 
           else if (depth === 1) {
