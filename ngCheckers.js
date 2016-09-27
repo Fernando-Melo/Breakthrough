@@ -63,6 +63,7 @@ angular.module('ngCheckers', [])
       if (selectedSquare !== null && !square.player) {
         //alert('1');
         movePiece(square);
+        checkGameOver(square);      
         resetChoices();
       } else if (square.player === $scope.player) {
         //alert('2');
@@ -72,6 +73,7 @@ angular.module('ngCheckers', [])
       } else {
         //alert('3');
         movePiece(square);
+        checkGameOver(square);        
         resetChoices();
         selectedSquare = null;
       }
@@ -129,7 +131,7 @@ angular.module('ngCheckers', [])
         $scope.redScore++;
         if ($scope.redScore === 8) {
           $timeout(function() {
-            gameOver(RED);
+            //gameOver(RED);
           },50)
         }
       }
@@ -137,7 +139,7 @@ angular.module('ngCheckers', [])
         $scope.blackScore++;
         if ($scope.blackScore === 8) {
           $timeout(function() {
-            gameOver(BLACK);
+           // gameOver(BLACK);
           },50)
         }
       }
@@ -209,12 +211,13 @@ angular.module('ngCheckers', [])
       }
     }
 
-    function gameOver(player) {
-      if (player) {
-        alert(player + " wins!");
-      } else {
-        alert("Stalemate");
-      }
+    function checkGameOver(square){
+        if (square.player === RED && square.y == 0)
+            {top.alert('Red wins');
+            $scope.newGame();}
+        if(square.player === BLACK && square.y == BOARD_WIDTH - 1)
+            {top.alert('Black wins'); 
+            $scope.newGame();} 
     }
 
   });
