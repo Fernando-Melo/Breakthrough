@@ -2,7 +2,7 @@
 angular.module('ngBreakthrough', [])
 
   .controller('breakthroughCtrl', function($scope, $timeout) { 
-    var RED = "Red", BLACK = "Black", BOARD_WIDTH = 8,
+    var RED = "Red", BLACK = "Black", BOARD_WIDTH = 7,
         selectedSquare = null;
 
     function Piece(player, x, y) {
