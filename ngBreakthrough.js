@@ -1,7 +1,7 @@
 
-angular.module('ngCheckers', [])
+angular.module('ngBreakthrough', [])
 
-  .controller('checkersCtrl', function($scope, $timeout) { 
+  .controller('breakthroughCtrl', function($scope, $timeout) { 
     var RED = "Red", BLACK = "Black", BOARD_WIDTH = 8,
         selectedSquare = null;
 
